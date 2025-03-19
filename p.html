@@ -1,19 +1,34 @@
-<meta content="noindex, nofollow, noarchive" name="robots"/>
-<meta name="referrer" content="no-referrer" />
-<script src="https://content.jwplatform.com/libraries/IDzF9Zmk.js"></script>
-    <style>
-      div#player {
-        width: 100%;
-        height: 100%;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta content="noindex, nofollow, noarchive" name="robots" />
+  <meta name="referrer" content="no-referrer" />
+  <script src="https://content.jwplatform.com/libraries/IDzF9Zmk.js"></script>
+  <style>
+    /* تخصيص حجم مشغل الفيديو ليشغل الشاشة بالكامل */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
     }
-     
-      </style>
-<div id="player"></div>
+
+    #jwplayer-container {
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+  </style>
+  <title>مشغل الفيديو</title>
+</head>
+<body>
+  <div id="jwplayer-container"></div>
+    
     <script>
         function getParameterByName(name) {
             name = name.replace(/[\[\]]/g, "\\$&");
@@ -997,3 +1012,5 @@ if (config) {
             document.getElementById("player").innerHTML = '<iframe src="https://streamtp1.com/global1.php?stream=eventos" width="100%" height="100%" scrolling="no" allow="encrypted-media" allowfullscreen="true" frameborder="0" style="position:absolute; top:0; left: 0"></iframe>';
         }
     </script>
+</body>
+</html>
