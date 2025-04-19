@@ -1,0 +1,208 @@
+<div class='post-body'><div class='post-body'><head>
+    <meta charset="UTF-8"></meta>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
+    <title>Full-Screen JW Player</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script src="https://content.jwplatform.com/libraries/KB5zFt7A.js"></script>
+
+   
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: black;
+        }
+        #player-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background-color: black;
+        }
+        #player {
+            width: 100%;
+            height: 100%;
+        }
+        .jw-wrapper.jw-reset {
+            position: fixed;
+        }
+    </style>
+</head>
+<body>
+
+    <img loading="lazy" src="https://livetv.wtvpc.com/wp-content/uploads/2017/06/tv-image.gif" style="display: none;" />
+    
+    <div id="player-container">
+        <div id="player">Loading the player...</div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var mora = getParameterByName('mora');
+            var embed = getParameterByName('embed');
+            var getIMG = getParameterByName('img') || '';
+            var title = getParameterByName('title') || '';
+            var getKEY = getParameterByName('key');
+            var getKEY2 = getParameterByName('key2');
+            var playerContainer = document.getElementById('player-container');
+
+            if (mora) {
+                jwplayer.key = 'cLGMn8T20tGvW+0eXPhq4NNmLB57TrscPjd1IyJF84o=';
+
+                if (mora === "#") {
+                    alert('Return to the previous page');
+                    return;
+                }
+
+                var playerInstance = jwplayer("player");
+                var sources = [];
+                var fileType = "";
+
+                if (mora.endsWith(".m3u8")) {
+                    fileType = "hls";
+                } else if (mora.endsWith(".mp4")) {
+                    fileType = "mp4";
+                } else if (mora.endsWith(".mpd")) {
+                    fileType = "dash";
+                }
+
+                if (fileType) {
+                    sources.push({
+                        "default": true,
+                        "type": fileType,
+                        "file": mora,
+                        "label": fileType.toUpperCase(),
+                        "preload": "auto",
+                        "crossorigin": "anonymous"
+                    });
+                }
+
+                var playerSetup = {
+                    playlist: [{
+                        "title": decodeURIComponent(title),
+                        "description": "Ultra HD | Sports Player",
+                        "image": decodeURIComponent(getIMG),
+                        "sources": sources
+                    }],
+                    width: "100%",
+                    height: "100%",
+                    aspectratio: "16:9",
+                    autostart: true,
+                    cast: {},
+                    logo: {
+                        file: "#",
+                        link: "#",
+                        position: "top-right"
+                    },
+                    advertising: {
+                        client: "vast",
+                        schedule: [{
+                            offset: "pre",
+                            tag: "sdsd"
+                        }]
+                    },
+                    skin: { name: "netflix" },
+                    sharing: { link: "#" },
+                    hlsjsConfig: {
+                        debug: false,
+                        p2pConfig: { live: true }
+                    }
+                };
+
+                if (fileType === "dash") {
+                    playerSetup.drm = {
+                        "clearkey": {
+                            "keyId": getKEY,
+                            "key": getKEY2
+                        }
+                    };
+                }
+
+                playerInstance.setup(playerSetup);
+
+                // Track JW Player events in Google Analytics
+                playerInstance.on('play', function () {
+                    gtag('event', 'play', {
+                        'event_category': 'Video',
+                        'event_label': title || 'Unknown Video'
+                    });
+                });
+
+                playerInstance.on('pause', function () {
+                    gtag('event', 'pause', {
+                        'event_category': 'Video',
+                        'event_label': title || 'Unknown Video'
+                    });
+                });
+
+                playerInstance.on('complete', function () {
+                    gtag('event', 'complete', {
+                        'event_category': 'Video',
+                        'event_label': title || 'Unknown Video'
+                    });
+                });
+
+                playerInstance.on('error', function (error) {
+                    console.error("Playback Error:", error.message);
+                    gtag('event', 'error', {
+                        'event_category': 'Video',
+                        'event_label': title || 'Unknown Video',
+                        'value': error.message
+                    });
+                });
+
+                // Track how long users watch the video
+                let watchStartTime = 0;
+                let totalWatchTime = 0;
+
+                playerInstance.on('play', function () {
+                    watchStartTime = Date.now();
+                });
+
+                playerInstance.on('pause complete', function () {
+                    if (watchStartTime) {
+                        totalWatchTime += (Date.now() - watchStartTime) / 1000;
+                        watchStartTime = 0;
+                    }
+                });
+
+                window.addEventListener("beforeunload", function () {
+                    gtag('event', 'watch_time', {
+                        'event_category': 'Video',
+                        'event_label': title || 'Unknown Video',
+                        'value': Math.round(totalWatchTime)
+                    });
+                });
+
+                playerInstance.on('time', function (event) {
+                    gtag('event', 'watch_progress', {
+                        'event_category': 'Video',
+                        'event_label': title || 'Unknown Video',
+                        'value': Math.round(event.position)
+                    });
+                });
+
+            } else if (embed) {
+    playerContainer.innerHTML = `<iframe src="${embed}" width="100%" height="100%" frameborder="0" scrolling="no" allowfullscreen></iframe>`;
+} else {
+                playerContainer.innerHTML = '<p>No media or embed URL provided.</p>';
+            }
+        });
+
+        function getParameterByName(name, url = window.location.href) {
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+            var results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+    </script>
+</body>
+</div></div>
