@@ -1,0 +1,149 @@
+--></style>
+</head><!--<link href='https://draft.blogger.com/dyn-css/authorization.css?targetBlogID=3368707933502938490&amp;zx=cadd44c5-dd8e-45db-9c0c-29bb0e0ae61e' media='none' onload='if(media!=&#39;all&#39;)media=&#39;all&#39;' rel='stylesheet'/><noscript><link href='https://draft.blogger.com/dyn-css/authorization.css?targetBlogID=3368707933502938490&amp;zx=cadd44c5-dd8e-45db-9c0c-29bb0e0ae61e' rel='stylesheet'/></noscript>
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+
+</head>--><script>/*<![CDATA[*/ cookieChoices = {}; /*]]>*/</script>
+<body>
+<div class='main section' id='main'>
+<div class='widget Blog' data-version='2' id='Blog1'>
+<script src='https://dev.sting-web.com/advertisements/cdn.js'></script><div class='STING-WEB_Post'><div class='STING-WEB_PostContent'>
+<!--DOCTYPE html-->
+<html>
+<head>
+    <title>alraqi-tv</title>
+    <style>
+        div a img{visibility:hidden;}
+        body{margin:0;background-color: black;}
+        .shaka-seek-bar-container .shaka-seek-bar {
+            background: linear-gradient(to right, #051937, #00205b, #00247e, #22229f, #510dbc);
+        }
+        .shaka-volume-bar-container .shaka-volume-bar {
+            background: linear-gradient(to right, #051937, #00205b, #00247e, #22229f, #510dbc);
+        }
+        .shaka-video-container .material-icons-round {
+            color: #00abe2;
+        }
+        .shaka-spinner-path {
+            stroke-dasharray: 1, 2000;
+            stroke-dashoffset: 0;
+            animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
+            stroke-linecap: round;
+        }
+        @keyframes color {
+            100%, 0% { stroke: #d62d20; }
+            40% { stroke: #0057e7; }
+            66% { stroke: #008744; }
+            80%, 90% { stroke: #ffa700; }
+        }
+        
+        /* Ø&#165;Ø&#182;Ø&#167;Ù&#129;Ø&#169; object-fit: fill */
+        #video {
+            object-fit: fill !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <meta name="referrer" content="no-referrer" />
+    <script src='//cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/shaka-player.ui.min.js' crossorigin='alraqi-tv'></script>
+    <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/controls.min.css' crossorigin='alraqi-tv' />
+</head>
+<body>
+    
+    <div data-shaka-player-container style='position:absolute;z-index: -1;top: 0;left: 0;width: 100%; height: 100%;'>
+        <video autoplay data-shaka-player poster="https://up6.cc/2025/03/174328431874221.png" id='video'></video>
+    </div>
+
+    <script>
+        // Configuration object
+        var config = {
+            manifestUri: "https://stream.gumlet.io/68166332c4342f33615a9d41/6816633f32010edd9608b830/main.m3u8",
+            drm: {
+                clearKeys: {
+                    '': ''
+                }
+            },
+            ui: {
+                controlPanelElements: ['spacer','rewind','playback_rate','fast_forward','play_pause','mute','volume','time_and_duration','captions','language','quality','fullscreen','statistics','picture_in_picture','skip','cast','share','spacer'],
+                customContextMenu: true,
+                contextMenuElements: ['statistics','ad_statistics'],
+                statisticsList: ['width','height','playTime','bufferingTime','started','playedCompletely'],
+                playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
+                fastForwardRates: [2, 4, 8, 1],
+                rewindRates: [-1, -2, -4, -8],
+                volumeBarColors: {base:"rgba(255, 255, 255)",level:"rgba(255,87,34)"},
+                seekBarColors: {base: '#00EC00', buffered: '#ffffff', played: '#ff5722'}
+            },
+            player: {
+                abr: {
+                    defaultBandwidthEstimate: 16888,
+                    enabled: true,
+                    restrictions: {
+                        minHeight: 359,
+                        maxHeight: 720
+                    }
+                }
+            }
+        };
+
+        async function init() {
+            const video = document.getElementById('video');
+            const ui = video['ui'];
+            const controls = ui.getControls();
+            const player = controls.getPlayer();
+            
+            // Apply UI configuration
+            ui.configure(config.ui);
+            
+            window.player = player;
+            window.ui = ui;
+            
+            player.setTextTrackVisibility(true);
+            player.configure({
+                drm: config.drm,
+                abr: config.player.abr
+            });
+            
+            // ØªØ&#163;ÙƒÙŠØ&#175; ØªØ&#183;Ø&#168;ÙŠÙ&#8218; object-fit: fill
+            video.style.objectFit = 'fill';
+            video.style.width = '100%';
+            video.style.height = '100%';
+            
+            player.addEventListener('error', onPlayerErrorEvent);
+            controls.addEventListener('error', onUIErrorEvent);
+            
+            try {
+                await player.load(config.manifestUri);
+                console.log('The video has now been loaded!');
+            } catch (error) {
+                onPlayerError(error);
+            }
+        }
+
+        function onPlayerErrorEvent(errorEvent) {
+            onPlayerError(event.detail);
+        }
+
+        function onPlayerError(error) {
+            console.error('Error code', error.code, 'object', error);
+            // Auto-retry after 30 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 30000);
+        }
+
+        function onUIErrorEvent(errorEvent) {
+            onPlayerError(event.detail);
+        }
+
+        function initFailed(errorEvent) {
+            console.error('Unable to load the UI library!');
+        }
+
+        document.addEventListener('shaka-ui-loaded', init);
+        document.addEventListener('shaka-ui-load-failed', initFailed);
+    </script>
+</body>
+</html></div></div>
+</div></div>
