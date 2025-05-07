@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>alraqi-tv</title>
 
-  <!-- 1) مكتبة Shaka Core -->
+  <!-- 1) Shaka Core -->
   <script
     src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/shaka-player.compiled.js"
     crossorigin="anonymous">
   </script>
 
-  <!-- 2) مكتبة واجهة المستخدم + CSS -->
+  <!-- 2) Shaka UI + CSS -->
   <script
     src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/shaka-player.ui.min.js"
     crossorigin="anonymous">
@@ -20,6 +20,11 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/controls.min.css"
     rel="stylesheet"
     crossorigin="anonymous" />
+
+  <!-- 3) Material Icons لواجهة التحكم -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Icons+Round"
+    rel="stylesheet" />
 
   <style>
     body { margin: 0; background: #000; }
@@ -49,7 +54,8 @@
       id="video"
       autoplay
       data-shaka-player
-      poster="https://up6.cc/2025/03/174328431874221.png">
+      style="display: block;"
+      poster="">
     </video>
     <div id="error" class="error-message" style="display: none;">
       لم يتم تمرير رابط البث.<br>
@@ -58,19 +64,21 @@
   </div>
 
   <script>
-    // دالة لجلب قيمة المتغير src من عنوان الصفحة
+    // دالة لجلب قيمة المتغير src (والتي يجب أن تكون مُرمّزة)
     function getParam(name) {
       return new URLSearchParams(window.location.search).get(name);
     }
 
-    const manifestUri = getParam('src');
+    const encodedSrc = getParam('src');
+    const manifestUri = encodedSrc
+      ? decodeURIComponent(encodedSrc)
+      : null;
 
     async function initPlayer() {
       const video = document.getElementById('video');
       const errorEl = document.getElementById('error');
 
       if (!manifestUri) {
-        // لا يوجد src --> عرض رسالة خطأ وإخفاء الفيديو
         video.style.display = 'none';
         errorEl.style.display = 'block';
         return;
@@ -80,7 +88,6 @@
       const player = new shaka.Player(video);
       const ui = new shaka.ui.Overlay(player, video, video.parentElement);
 
-      // تفعيل إعدادات ABR (التكيف مع الشبكة)
       player.configure({
         abr: {
           enabled: true,
@@ -103,7 +110,7 @@
 
     document.addEventListener('shaka-ui-loaded', initPlayer);
     document.addEventListener('shaka-ui-load-failed',
-      () => console.error('❌ فشل تحميل مكتبة الواجهة'));
+      () => console.error('❌ فشل تحميل واجهة Shaka UI'));
   </script>
 </body>
 </html>
