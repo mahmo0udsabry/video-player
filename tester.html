@@ -1,116 +1,142 @@
+</style>
+</head><!--<link href='https://www.blogger.com/dyn-css/authorization.css?targetBlogID=3368707933502938490&amp;zx=78f6d7f8-71b0-4232-b209-d258b23000cc' media='none' onload='if(media!=&#39;all&#39;)media=&#39;all&#39;' rel='stylesheet'/><noscript><link href='https://www.blogger.com/dyn-css/authorization.css?targetBlogID=3368707933502938490&amp;zx=78f6d7f8-71b0-4232-b209-d258b23000cc' rel='stylesheet'/></noscript>
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+
+</head>--><script>/*<![CDATA[*/ cookieChoices = {}; /*]]>*/</script>
+<body>
+<div class='main section' id='main'>
+<div class='widget Blog' data-version='2' id='Blog1'>
+<script src='https://dev.sting-web.com/advertisements/cdn.js'></script><div class='STING-WEB_Post'><div class='STING-WEB_PostContent'>
+
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>alraqi-tv</title>
+    <title>alraqi-tv</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
 
-  <!-- 1) Shaka Core -->
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/shaka-player.compiled.js"
-    crossorigin="anonymous">
-  </script>
+    <style>
+        div a img { visibility: hidden; }
+        body { margin: 0; background-color: black; }
+        .shaka-seek-bar-container .shaka-seek-bar,
+        .shaka-volume-bar-container .shaka-volume-bar {
+            background: linear-gradient(to right,
+                #051937, #00205b, #00247e, #22229f, #510dbc);
+        }
+        .shaka-video-container .material-icons-round {
+            color: #00abe2;
+        }
+        .shaka-spinner-path {
+            stroke-dasharray: 1, 2000;
+            stroke-dashoffset: 0;
+            animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
+            stroke-linecap: round;
+        }
+        @keyframes color {
+            0%, 100% { stroke: #d62d20; }
+            40% { stroke: #0057e7; }
+            66% { stroke: #008744; }
+            80%, 90% { stroke: #ffa700; }
+        }
+        #video {
+            object-fit: fill !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+        [data-shaka-player-container] {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+        .error-message {
+            position: absolute;
+            top: 40%; width: 100%;
+            text-align: center;
+            color: #fff;
+            font-size: 1.2rem;
+            display: none;
+        }
+    </style>
 
-  <!-- 2) Shaka UI + CSS -->
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/shaka-player.ui.min.js"
-    crossorigin="anonymous">
-  </script>
-  <link
-    href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/controls.min.css"
-    rel="stylesheet"
-    crossorigin="anonymous" />
-
-  <!-- 3) Material Icons لواجهة التحكم -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Icons+Round"
-    rel="stylesheet" />
-
-  <style>
-    body { margin: 0; background: #000; }
-    .shaka-seek-bar, .shaka-volume-bar {
-      background: linear-gradient(to right,
-        #051937, #00205b, #00247e, #22229f, #510dbc);
-    }
-    #video {
-      width: 100%; height: 100%;
-      object-fit: fill !important;
-    }
-    [data-shaka-player-container] {
-      position: relative;
-      width: 100vw; height: 100vh;
-    }
-    .error-message {
-      color: white;
-      font-size: 1.2rem;
-      text-align: center;
-      padding-top: 40vh;
-    }
-  </style>
+    <!-- Shaka Player Core -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/shaka-player.compiled.js"
+      crossorigin="anonymous">
+    </script>
+    <!-- Shaka UI + CSS -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/shaka-player.ui.min.js"
+      crossorigin="anonymous">
+    </script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/controls.min.css"
+      rel="stylesheet"
+      crossorigin="anonymous" />
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Icons+Round"
+      rel="stylesheet" />
 </head>
 <body>
-  <div data-shaka-player-container>
-    <video
-      id="video"
-      autoplay
-      data-shaka-player
-      style="display: block;"
-      poster="">
-    </video>
-    <div id="error" class="error-message" style="display: none;">
-      لم يتم تمرير رابط البث.<br>
-      الرجاء إضافة متغيّر <code>?src=رابط_البث.m3u8</code>
+    <div data-shaka-player-container>
+        <video autoplay id="video" data-shaka-player poster="">
+        </video>
+        <div id="error" class="error-message">
+            لم يتم تمرير رابط البث.<br>
+            الرجاء إضافة <code>?src=رابط_البث.m3u8</code>
+        </div>
     </div>
-  </div>
 
-  <script>
-    // دالة لجلب قيمة المتغير src (والتي يجب أن تكون مُرمّزة)
-    function getParam(name) {
-      return new URLSearchParams(window.location.search).get(name);
-    }
-
-    const encodedSrc = getParam('src');
-    const manifestUri = encodedSrc
-      ? decodeURIComponent(encodedSrc)
-      : null;
-
-    async function initPlayer() {
-      const video = document.getElementById('video');
-      const errorEl = document.getElementById('error');
-
-      if (!manifestUri) {
-        video.style.display = 'none';
-        errorEl.style.display = 'block';
-        return;
-      }
-
-      // إنشاء لاعب Shaka مع الواجهة
-      const player = new shaka.Player(video);
-      const ui = new shaka.ui.Overlay(player, video, video.parentElement);
-
-      player.configure({
-        abr: {
-          enabled: true,
-          defaultBandwidthEstimate: 16888,
-          restrictions: { minHeight: 359, maxHeight: 720 }
+    <script>
+        function getParam(name) {
+            return new URLSearchParams(window.location.search).get(name);
         }
-      });
 
-      try {
-        await player.load(manifestUri);
-        console.log('🚀 الفيديو جاهز للمشاهدة');
-      } catch (error) {
-        console.error('❌ خطأ في تحميل الفيديو:', error);
-        setTimeout(() => location.reload(), 30000);
-      }
+        const encoded = getParam('src');
+        const manifestUri = encoded ? decodeURIComponent(encoded) : null;
 
-      player.addEventListener('error', e => console.error('Player Error:', e.detail));
-      ui.getControls().addEventListener('error', e => console.error('UI Error:', e.detail));
-    }
+        async function init() {
+            const video = document.getElementById('video');
+            const errorEl = document.getElementById('error');
 
-    document.addEventListener('shaka-ui-loaded', initPlayer);
-    document.addEventListener('shaka-ui-load-failed',
-      () => console.error('❌ فشل تحميل واجهة Shaka UI'));
-  </script>
+            if (!manifestUri) {
+                video.style.display = 'none';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            const player = new shaka.Player(video);
+            const ui = new shaka.ui.Overlay(player, video, video.parentElement);
+
+            player.configure({
+                abr: {
+                    enabled: true,
+                    defaultBandwidthEstimate: 16888,
+                    restrictions: { minHeight: 359, maxHeight: 720 }
+                }
+            });
+
+            try {
+                await player.load(manifestUri);
+                console.log('🚀 Video loaded successfully');
+            } catch (e) {
+                console.error('❌ Failed to load video:', e);
+                setTimeout(() => location.reload(), 30000);
+            }
+
+            player.addEventListener('error', e => console.error('Player Error:', e.detail));
+            ui.getControls().addEventListener('error', e => console.error('UI Error:', e.detail));
+        }
+
+        document.addEventListener('shaka-ui-loaded', init);
+        document.addEventListener('shaka-ui-load-failed',
+            () => console.error('❌ Shaka UI failed to load'));
+    </script>
 </body>
 </html>
+
+</div></div>
+</div></div>
