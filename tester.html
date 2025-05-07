@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <title>alraqi-tv</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/controls.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/shaka-player.ui.min.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+    }
+    #video {
+      object-fit: fill !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    .shaka-seek-bar-container .shaka-seek-bar {
+      background: linear-gradient(to right, #051937, #00205b, #00247e, #22229f, #510dbc);
+    }
+    .shaka-volume-bar-container .shaka-volume-bar {
+      background: linear-gradient(to right, #051937, #00205b, #00247e, #22229f, #510dbc);
+    }
+    .shaka-video-container .material-icons-round {
+      color: #00abe2;
+    }
+    .shaka-spinner-path {
+      stroke-dasharray: 1, 2000;
+      stroke-dashoffset: 0;
+      animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
+      stroke-linecap: round;
+    }
+    @keyframes color {
+      0%, 100% { stroke: #d62d20; }
+      40% { stroke: #0057e7; }
+      66% { stroke: #008744; }
+      80%, 90% { stroke: #ffa700; }
+    }
+  </style>
+</head>
+<body>
+  <div data-shaka-player-container style="height: 100vh; width: 100vw; position: relative;">
+    <video autoplay data-shaka-player id="video" poster="https://up6.cc/2025/03/174328431874221.png"></video>
+  </div>
+
+  <script>
+    function getParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    const manifestUri = getParam('src') || "https://hls-cdn-mejarserver.tigan.pro/svc-spo-fhd-08-dt/playlist.m3u8?dvr=true";
+
+    const config = {
+      drm: { clearKeys: { '': '' } },
+      ui: {
+        controlPanelElements: [
+          'spacer','rewind','playback_rate','fast_forward','play_pause','mute',
+          'volume','time_and_duration','captions','language','quality',
+          'fullscreen','statistics','picture_in_picture','skip','cast','share','spacer'
+        ],
+        customContextMenu: true,
+        contextMenuElements: ['statistics', 'ad_statistics'],
+        playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
+        fastForwardRates: [2, 4, 8, 1],
+        rewindRates: [-1, -2, -4, -8],
+        volumeBarColors: { base: "rgba(255, 255, 255)", level: "rgba(255,87,34)" },
+        seekBarColors: { base: '#00EC00', buffered: '#ffffff', played: '#ff5722' }
+      },
+      player: {
+        abr: {
+          defaultBandwidthEstimate: 16888,
+          enabled: true,
+          restrictions: {
+            minHeight: 359,
+            maxHeight: 720
+          }
+        }
+      }
+    };
+
+    async function initPlayer() {
+      const video = document.getElementById('video');
+      const ui = video['ui'];
+      const controls = ui.getControls();
+      const player = controls.getPlayer();
+
+      ui.configure(config.ui);
+      player.setTextTrackVisibility(true);
+      player.configure({
+        drm: config.drm,
+        abr: config.player.abr
+      });
+
+      try {
+        await player.load(manifestUri);
+        console.log('Video loaded successfully');
+      } catch (error) {
+        console.error('Video load failed', error);
+        setTimeout(() => window.location.reload(), 30000);
+      }
+
+      player.addEventListener('error', e => console.error('Player Error:', e.detail));
+      controls.addEventListener('error', e => console.error('UI Error:', e.detail));
+    }
+
+    document.addEventListener('shaka-ui-loaded', initPlayer);
+    document.addEventListener('shaka-ui-load-failed', () => console.error('UI library failed to load'));
+  </script>
+</body>
+</html>
