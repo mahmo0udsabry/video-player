@@ -5,59 +5,105 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>alraqi-tv</title>
 
-  <!-- 1) شملت Core قبل UI -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/shaka-player.compiled.js"
-          integrity="sha384-..." crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/shaka-player.ui.min.js"
-          integrity="sha384-..." crossorigin="anonymous"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/controls.min.css"
-        rel="stylesheet" integrity="sha384-..." crossorigin="anonymous"/>
-  
+  <!-- 1) مكتبة Shaka Core -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/shaka-player.compiled.js"
+    crossorigin="anonymous">
+  </script>
+
+  <!-- 2) مكتبة واجهة المستخدم + CSS -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/shaka-player.ui.min.js"
+    crossorigin="anonymous">
+  </script>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.10.0/controls.min.css"
+    rel="stylesheet"
+    crossorigin="anonymous" />
+
   <style>
     body { margin: 0; background: #000; }
     .shaka-seek-bar, .shaka-volume-bar {
-      background: linear-gradient(to right, #051937, #00205b, #00247e, #22229f, #510dbc);
+      background: linear-gradient(to right,
+        #051937, #00205b, #00247e, #22229f, #510dbc);
     }
-    .shaka-spinner-path { /* لو تحب تترك التحريك كما كان */ }
-    /* ... أي تعديلات CSS أخرى ... */
+    #video {
+      width: 100%; height: 100%;
+      object-fit: fill !important;
+    }
+    [data-shaka-player-container] {
+      position: relative;
+      width: 100vw; height: 100vh;
+    }
+    .error-message {
+      color: white;
+      font-size: 1.2rem;
+      text-align: center;
+      padding-top: 40vh;
+    }
   </style>
 </head>
 <body>
-  <div data-shaka-player-container style="position:relative; width:100vw; height:100vh;">
-    <video id="video"
-           autoplay
-           data-shaka-player
-           poster="https://up6.cc/2025/03/174328431874221.png"
-           style="width:100%; height:100%; object-fit:fill;">
+  <div data-shaka-player-container>
+    <video
+      id="video"
+      autoplay
+      data-shaka-player
+      poster="https://up6.cc/2025/03/174328431874221.png">
     </video>
+    <div id="error" class="error-message" style="display: none;">
+      لم يتم تمرير رابط البث.<br>
+      الرجاء إضافة متغيّر <code>?src=رابط_البث.m3u8</code>
+    </div>
   </div>
 
   <script>
-    // دالة تجلب قيمة المتغير من الرابط
+    // دالة لجلب قيمة المتغير src من عنوان الصفحة
     function getParam(name) {
       return new URLSearchParams(window.location.search).get(name);
     }
 
-    // المسار الافتراضي لو لم يمرر src
-    const manifestUri = getParam('src') || 'https://hls-cdn-mejarserver.tigan.pro/svc-spo-fhd-08-dt/playlist.m3u8?dvr=true';
+    const manifestUri = getParam('src');
 
     async function initPlayer() {
       const video = document.getElementById('video');
-      const ui = new shaka.ui.Overlay(new shaka.Player(), video, video.parentElement);
-      ui.getControls().getPlayer().configure({
-        abr: { enabled: true, defaultBandwidthEstimate: 16888, restrictions: { minHeight: 359, maxHeight: 720 } }
+      const errorEl = document.getElementById('error');
+
+      if (!manifestUri) {
+        // لا يوجد src --> عرض رسالة خطأ وإخفاء الفيديو
+        video.style.display = 'none';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      // إنشاء لاعب Shaka مع الواجهة
+      const player = new shaka.Player(video);
+      const ui = new shaka.ui.Overlay(player, video, video.parentElement);
+
+      // تفعيل إعدادات ABR (التكيف مع الشبكة)
+      player.configure({
+        abr: {
+          enabled: true,
+          defaultBandwidthEstimate: 16888,
+          restrictions: { minHeight: 359, maxHeight: 720 }
+        }
       });
-      
+
       try {
-        await ui.getControls().getPlayer().load(manifestUri);
+        await player.load(manifestUri);
         console.log('🚀 الفيديو جاهز للمشاهدة');
-      } catch (e) {
-        console.error('❌ خطأ في تحميل الفيديو:', e);
+      } catch (error) {
+        console.error('❌ خطأ في تحميل الفيديو:', error);
         setTimeout(() => location.reload(), 30000);
       }
+
+      player.addEventListener('error', e => console.error('Player Error:', e.detail));
+      ui.getControls().addEventListener('error', e => console.error('UI Error:', e.detail));
     }
 
-    document.addEventListener('DOMContentLoaded', initPlayer);
+    document.addEventListener('shaka-ui-loaded', initPlayer);
+    document.addEventListener('shaka-ui-load-failed',
+      () => console.error('❌ فشل تحميل مكتبة الواجهة'));
   </script>
 </body>
 </html>
