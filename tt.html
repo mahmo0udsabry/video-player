@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
+  <!-- هنا سيطبق CSP فعلاً لأن هذه الصفحة كاملة -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; connect-src https://ante.is-a.dev https://cdnvine.com; script-src 'self' https://shaka-player.appspot.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Hidden HLS Player</title>
+  <style>html,body{margin:0;padding:0;height:100%;overflow:hidden;}video{width:100%;height:100%;}</style>
+</head>
+<body>
+  <video id="video" autoplay playsinline muted></video>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.6/shaka-player.compiled.js"></script>
+  <script>
+    shaka.polyfill.installAll();
+    (async()=> {
+      const player = new shaka.Player(document.getElementById('video'));
+      await player.load('https://ante.is-a.dev/proxy/channel?url=http%3A%2F%2Fcdnvine.com%3A8080%2Fbn1hd%2Ftracks-v1a1%2Fmono.m3u8');
+    })();
+  </script>
+</body>
+</html>
