@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <title>بث مباشر</title>
+
+    <!-- تضمين Video.js -->
+    <link href="https://vjs.zencdn.net/8.3.0/video-js.css" rel="stylesheet" />
+    <style>
+      /* تأكد من ملء الصفحة */
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background-color: #000;
+      }
+      /* يملأ الفيديو كامل الصفحة */
+      #my-player {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      /* تزيل أي عناصر زائدة من الفيديو */
+      .video-js .vjs-control-bar,
+      .video-js .vjs-big-play-button {
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <video
+      id="my-player"
+      class="video-js vjs-default-skin"
+      controls
+      autoplay
+      playsinline
+      preload="auto"
+      data-setup='{}'
+    >
+      <source
+        src="https://ante.is-a.dev/proxy/channel?url=http%3A%2F%2Fcdnvine.com%3A8080%2Fbn2hd%2Ftracks-v1a1%2Fmono.m3u8"
+        type="application/x-mpegURL"
+      />
+      متصفحك لا يدعم تشغيل الفيديو.
+    </video>
+
+    <script src="https://vjs.zencdn.net/8.3.0/video.min.js"></script>
+  </body>
+</html>
